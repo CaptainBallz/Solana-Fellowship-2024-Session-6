@@ -51,10 +51,9 @@ const Cart = ({ cart, totalAmount, removeFromCart}) => {
           return;
         }
         const amount = new BigNumber(totalAmount);  
-        const newReference = Keypair.generate().publicKey;  // Generate random reference key for the transaction
+        const newReference = Keypair.generate().publicKey; 
         setReference(newReference)
         try {
-            // Generate Solana Pay payment URL without reference
             const url = encodeURL({ recipient, amount, newReference });
             console.log(url.toString());
             setPaymentUrl(url.toString());
@@ -71,16 +70,14 @@ const Cart = ({ cart, totalAmount, removeFromCart}) => {
     
         const interval = setInterval(async () => {
           try {
-            // Get transaction signatures for the reference address
             console.log("Checking Transaction");
             const signatures = await connection.getSignaturesForAddress(reference);
     
             if (signatures.length > 0) {
-              const transactionSignature = signatures[0].signature; // Get the first transaction signature
+              const transactionSignature = signatures[0].signature;
     
               console.log('Transaction detected:', transactionSignature);
     
-              // Confirm the transaction and update payment status
               const result = await connection.confirmTransaction(transactionSignature, 'confirmed');
     
               if (result.value.err) {
@@ -91,15 +88,14 @@ const Cart = ({ cart, totalAmount, removeFromCart}) => {
                 openNotificationWithIcon("success","Transaction confirmed")
               }
     
-              // Clear the interval once the transaction is confirmed
               clearInterval(interval);
             }
           } catch (error) {
             console.error('Error fetching signatures:', error);
           }
-        }, 5000); // Poll every 5 seconds
+        }, 5000);
     
-        return () => clearInterval(interval); // Clean up the interval when the component is unmounted
+        return () => clearInterval(interval); 
       }, [reference]);
     // async function monitorTransaction(reference) {
     //     const connection = new Connection('https://api.mainnet-beta.solana.com');
